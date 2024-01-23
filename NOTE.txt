@@ -1,0 +1,12 @@
+Every input length w-2/3 = 342px
+
+TabsPrimitive.Content added class "mx-8"
+
+Customize Calender
+- add month and year
+- add prev and next
+- adjust size of picker
+
+Customize Select
+- remove check
+
