@@ -1,0 +1,10 @@
+POST http://192.168.110.152:9000/testjdbc/location/addLocation
+User-Agent: rest-client
+Content-Type: application/json
+mt-entity-code: MTMH
+
+###
+GET http://192.168.110.152:9000/testjdbc/location/getLocation?managing_organization=AMINAH
+User-Agent: rest-client
+Content-Type: application/json
+mt-entity-code: MTMH

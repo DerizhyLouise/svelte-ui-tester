@@ -1,0 +1,18 @@
+<Form.Field {config} name="status">
+    <Form.Item class="md:flex md:w-1/2 md:items-center 2xl:w-1/3">
+        <div class="md:w-1/3">
+            <Form.Label class="mb-1 block pr-4 font-bold text-red-500 md:mb-0" for="status">Location Type*</Form.Label>
+        </div>
+        <div class="pr-4 md:w-2/3">
+            <Form.Select>
+                <Form.SelectTrigger placeholder="--Please Select--" class="h-7 border-2 border-gray-200 rounded  disabled:bg-gray-200" />
+                <Form.SelectContent>
+                    {#each statuss as { value, label } (value)}
+                        <Form.SelectItem {value}>{label}</Form.SelectItem>
+                    {/each}
+                </Form.SelectContent>
+            </Form.Select>
+        </div>
+        <Form.Validation />
+    </Form.Item>
+</Form.Field>
