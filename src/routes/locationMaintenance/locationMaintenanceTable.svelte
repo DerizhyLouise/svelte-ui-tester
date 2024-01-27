@@ -1,27 +1,78 @@
 <script lang="ts">
 	import { createTable, Render, Subscribe, createRender } from 'svelte-headless-table';
-	import { addPagination, addSortBy, addTableFilter, addHiddenColumns, addSelectedRows } from 'svelte-headless-table/plugins';
+	import {
+		addPagination,
+		addSortBy,
+		addTableFilter,
+		addHiddenColumns,
+		addSelectedRows
+	} from 'svelte-headless-table/plugins';
 	import { readable } from 'svelte/store';
 	import { Button } from '$lib/components/ui/button';
-	import { Input } from "$lib/components/ui/input";
+	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
-    import { Separator } from "$lib/components/ui/separator";
-	import * as Sheet from "$lib/components/ui/sheet";
-	import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
+	import { Separator } from '$lib/components/ui/separator';
+	import * as Sheet from '$lib/components/ui/sheet';
+	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import * as Table from '$lib/components/ui/table';
-	import { ArrowUp, ArrowDown, ChevronDown } from "lucide-svelte";
-	import type { PageData } from "./$types";
-	import type { Location } from "./location";
-	import type { Writable } from "svelte/store";
-	import DataTableActions from "./locationMaintenanceTableAction.svelte";
-	import LocationMaintenanceForm from "./locationMaintenanceForm.svelte";
-	import DataTableCheckbox from "./locationMaintenanceTableCheckbox.svelte";
+	import { ArrowUp, ArrowDown, ChevronDown } from 'lucide-svelte';
+	import type { PageData } from './$types';
+	import type { Location } from './location';
+	import type { Writable } from 'svelte/store';
+	import DataTableActions from './locationMaintenanceTableAction.svelte';
+	import LocationMaintenanceForm from './locationMaintenanceForm.svelte';
+	import DataTableCheckbox from './locationMaintenanceTableCheckbox.svelte';
+	import { invalidate, invalidateAll } from '$app/navigation';
 
 	export let pageData: PageData;
 
 	let rowIndex = 0;
 	const data: Location[] = pageData.locationList;
-	
+	// const data: Location[] = [
+	// 	{
+	// 		location_id: 1,
+	// 		location_name: 'Murni',
+	// 		location_mode: 'instance',
+	// 		status: 'active',
+	// 		location_alias: 'MTMH',
+	// 		description: 'Memorial Murni Teguh',
+	// 		address: ' Jl. Jawa',
+	// 		position_longitude: 0.10000000149011612,
+	// 		position_latitude: 0.20000000298023224,
+	// 		position_altitude: 0.30000001192092896,
+	// 		entity_code: 'MTMH',
+	// 		defunct_ind: false
+	// 	},
+	// 	{
+	// 		location_id: 3,
+	// 		location_name: 'tes',
+	// 		location_mode: 'instance',
+	// 		status: 'active',
+	// 		location_alias: 'MTMH',
+	// 		description: 'tes',
+	// 		address: 'tes',
+	// 		position_longitude: 0.10000000149011612,
+	// 		position_latitude: 0.20000000298023224,
+	// 		position_altitude: 0.30000001192092896,
+	// 		entity_code: 'MTMH',
+	// 		defunct_ind: true
+	// 	},
+	// 	{
+	// 		location_id: 2,
+	// 		location_name: 'p',
+	// 		location_mode: 'p',
+	// 		status: 'p',
+	// 		location_alias: 'MTMH',
+	// 		description: 'p',
+	// 		address: 'p',
+	// 		position_longitude: 0.10000000149011612,
+	// 		position_latitude: 0.20000000298023224,
+	// 		position_altitude: 0.30000001192092896,
+	// 		entity_code: 'MTMH',
+	// 		defunct_ind: false
+	// 	}
+	// ];
+
 	const table = createTable(readable(data), {
 		page: addPagination(),
 		sort: addSortBy({ disableMultiSort: false }),
@@ -37,7 +88,7 @@
 			header: (_, { pluginStates }) => {
 				const { allPageRowsSelected } = pluginStates.select;
 				return createRender(DataTableCheckbox, {
-				checked: allPageRowsSelected
+					checked: allPageRowsSelected
 				});
 			},
 			cell: ({ row }, { pluginStates }) => {
@@ -45,20 +96,20 @@
 				const { isSelected } = getRowState(row);
 
 				return createRender(DataTableCheckbox, {
-				checked: isSelected
+					checked: isSelected
 				});
 			},
 			plugins: {
-				sort: {disable: true},
-				filter: {exclude: true}
+				sort: { disable: true },
+				filter: { exclude: true }
 			}
 		}),
 		table.column({
 			accessor: ({ location_id }) => location_id,
 			header: '',
 			plugins: {
-				sort: {disable: true},
-				filter: {exclude: true}
+				sort: { disable: true },
+				filter: { exclude: true }
 			},
 			cell: ({ value }) => {
 				return createRender(DataTableActions, { location_id: value });
@@ -68,8 +119,8 @@
 			accessor: ({ location_id }) => location_id,
 			header: 'No',
 			plugins: {
-				sort: {disable: true},
-				filter: {exclude: true}
+				sort: { disable: true },
+				filter: { exclude: true }
 			},
 			cell: ({ value }) => {
 				rowIndex++;
@@ -80,80 +131,80 @@
 			accessor: 'status',
 			header: 'Status',
 			plugins: {
-				sort: {disable: false},
-				filter: {exclude: false}
+				sort: { disable: false },
+				filter: { exclude: false }
 			}
 		}),
 		table.column({
 			accessor: 'location_name',
 			header: 'Location Name',
 			plugins: {
-				sort: {disable: false},
-				filter: {exclude: false}
+				sort: { disable: false },
+				filter: { exclude: false }
 			}
 		}),
 		table.column({
 			accessor: 'location_alias',
 			header: 'Location Alias',
 			plugins: {
-				sort: {disable: false},
-				filter: {exclude: false}
+				sort: { disable: false },
+				filter: { exclude: false }
 			}
 		}),
 		table.column({
 			accessor: 'description',
 			header: 'Description',
 			plugins: {
-				sort: {disable: false},
-				filter: {exclude: false}
+				sort: { disable: false },
+				filter: { exclude: false }
 			}
 		}),
 		table.column({
 			accessor: 'location_mode',
 			header: 'Location Mode',
 			plugins: {
-				sort: {disable: false},
-				filter: {exclude: false}
+				sort: { disable: false },
+				filter: { exclude: false }
 			}
 		}),
 		table.column({
 			accessor: 'address',
 			header: 'Address',
 			plugins: {
-				sort: {disable: false},
-				filter: {exclude: false}
+				sort: { disable: false },
+				filter: { exclude: false }
 			}
 		}),
 		table.column({
 			accessor: 'position_longitude',
 			header: 'Position Longitude',
 			plugins: {
-				sort: {disable: false},
-				filter: {exclude: false}
+				sort: { disable: false },
+				filter: { exclude: false }
 			}
 		}),
 		table.column({
 			accessor: 'position_latitude',
 			header: 'Position Latitude',
 			plugins: {
-				sort: {disable: false},
-				filter: {exclude: false}
+				sort: { disable: false },
+				filter: { exclude: false }
 			}
 		}),
 		table.column({
 			accessor: 'position_altitude',
 			header: 'Position Altitude',
 			plugins: {
-				sort: {disable: false},
-				filter: {exclude: false}
+				sort: { disable: false },
+				filter: { exclude: false }
 			}
 		}),
 		table.column({
 			accessor: 'defunct_ind',
 			header: 'Defunct Indicator',
 			plugins: {
-				sort: {disable: true},
-				filter: {exclude: true}
+				sort: { disable: true },
+				filter: { exclude: true }
 			}
 		})
 	]);
@@ -169,15 +220,29 @@
 	let hideForId = Object.fromEntries(ids.map((id) => [id, true]));
 
 	$: $hiddenColumnIds = Object.entries(hideForId).filter(([, hide]) => !hide).map(([id]) => id);
-	const hidableCols = ["hospitalOrganization", "status", "location_mode", "location_name", "address", "location_alias", "managing_organization", "description", "position_longitude"];
+	const hidableCols = [
+		'hospitalOrganization',
+		'status',
+		'location_mode',
+		'location_name',
+		'address',
+		'location_alias',
+		'managing_organization',
+		'description',
+		'position_longitude'
+	];
+
+	function query() {
+		invalidateAll();
+	}
 </script>
 
 <div>
-	<div class="flex justify-end gap-2 w-full">
-		<Button class="bg-blue-600 hover:bg-blue-800 h-8">Query</Button>
+	<div class="flex w-full justify-end gap-2">
+		<Button class="h-8 bg-blue-600 hover:bg-blue-800" on:click={query}>Query</Button>
 		<Sheet.Root>
 			<Sheet.Trigger>
-				<Button class="bg-green-600 hover:bg-green-800 h-8">Add</Button>
+				<Button class="h-8 bg-green-600 hover:bg-green-800">Add</Button>
 			</Sheet.Trigger>
 			<Sheet.Content>
 				<Sheet.Header>
@@ -204,7 +269,7 @@
 			</Sheet.Content>
 		</Sheet.Root>
 	</div>
-	<div class="flex justify-between py-4 w-full">
+	<div class="flex w-full justify-between py-4">
 		<DropdownMenu.Root>
 			<DropdownMenu.Trigger asChild let:builder>
 				<Button variant="outline" builders={[builder]}>
@@ -214,16 +279,20 @@
 			<DropdownMenu.Content>
 				{#each flatColumns as col}
 					{#if hidableCols.includes(col.id)}
-					<DropdownMenu.CheckboxItem bind:checked={hideForId[col.id]}>
-						{col.header}
-					</DropdownMenu.CheckboxItem>
+						<DropdownMenu.CheckboxItem bind:checked={hideForId[col.id]}>
+							{col.header}
+						</DropdownMenu.CheckboxItem>
 					{/if}
 				{/each}
 			</DropdownMenu.Content>
 		</DropdownMenu.Root>
-		<div class="flex flex-row w-1/6 items-center">
+		<div class="flex w-1/6 flex-row items-center">
 			<Label class="mb-1 block pr-4 font-bold text-gray-500 md:mb-0">Search</Label>
-			<Input class="bg-white-200 w-full appearance-none rounded border-2 border-gray-200 px-4 py-2 leading-tight text-gray-700 focus:outline-none disabled:bg-gray-200" type="text" bind:value={$filterValue}/>
+			<Input
+				class="bg-white-200 w-full appearance-none rounded border-2 border-gray-200 px-4 py-2 leading-tight text-gray-700 focus:outline-none disabled:bg-gray-200"
+				type="text"
+				bind:value={$filterValue}
+			/>
 		</div>
 	</div>
 	<div class="rounded-md border">
@@ -238,9 +307,9 @@
 										<Button variant="ghost" on:click={props.sort.toggle}>
 											<Render of={cell.render()} />
 											{#if typeof $sortKeys[0] !== 'undefined' && $sortKeys[0].order === 'asc' && $sortKeys[0].id === cell.id}
-												<ArrowUp class={"ml-2 h-4 w-4"} />
+												<ArrowUp class={'ml-2 h-4 w-4'} />
 											{:else if typeof $sortKeys[0] !== 'undefined' && $sortKeys[0].order === 'desc' && $sortKeys[0].id === cell.id}
-												<ArrowDown class={"ml-2 h-4 w-4"} />
+												<ArrowDown class={'ml-2 h-4 w-4'} />
 											{/if}
 										</Button>
 									</Table.Head>
@@ -253,7 +322,11 @@
 			<Table.Body {...$tableBodyAttrs}>
 				{#each $pageRows as row (row.id)}
 					<Subscribe rowAttrs={row.attrs()} let:rowAttrs>
-						<Table.Row {...rowAttrs} class={row.isData() && row.original.defunct_ind ? "bg-red-400 hover:bg-red-500" : ""} data-state={$selectedDataIds[row.id] && "selected"}>
+						<Table.Row
+							{...rowAttrs}
+							class={row.isData() && row.original.defunct_ind ? 'bg-red-400 hover:bg-red-500' : ''}
+							data-state={$selectedDataIds[row.id] && 'selected'}
+						>
 							{#each row.cells as cell (cell.id)}
 								<Subscribe attrs={cell.attrs()} let:attrs>
 									<Table.Cell {...attrs}>
@@ -271,10 +344,20 @@
 	</div>
 	<div class="flex items-center justify-end space-x-2 py-4">
 		<div class="flex-1 text-sm text-muted-foreground">
-			{Object.keys($selectedDataIds).length} of{" "}
+			{Object.keys($selectedDataIds).length} of{' '}
 			{$rows.length} row(s) selected.
 		</div>
-		<Button variant="outline" size="sm" on:click={() => ($pageIndex = $pageIndex - 1)} disabled={!$hasPreviousPage}>Previous</Button>
-		<Button variant="outline" size="sm" disabled={!$hasNextPage} on:click={() => ($pageIndex = $pageIndex + 1)}>Next</Button>
+		<Button
+			variant="outline"
+			size="sm"
+			on:click={() => ($pageIndex = $pageIndex - 1)}
+			disabled={!$hasPreviousPage}>Previous</Button
+		>
+		<Button
+			variant="outline"
+			size="sm"
+			disabled={!$hasNextPage}
+			on:click={() => ($pageIndex = $pageIndex + 1)}>Next</Button
+		>
 	</div>
 </div>

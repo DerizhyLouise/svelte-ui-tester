@@ -4,8 +4,6 @@ import { fail } from "@sveltejs/kit";
 import type { PageServerLoad, Actions } from "./$types";
 import type { Location } from "./location"
 
-const data: Location[] = [];
-
 async function fetchData() {
     const apiUrl = 'http://192.168.110.152:9000/testjdbc/location/getLocation';
     const headers = new Headers({
@@ -23,24 +21,22 @@ async function fetchData() {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
 
-        // const fetchedData: Location[] = await response.json();
         const fetchedData = await response.json();
-        console.log(fetchedData.data);
         const location: Location[] = fetchedData.data;
-        data.push(...location);
-        return data;
+        return location;
     } catch (error) {
         console.error('Error fetching data:', error);
     }
+    return [];
 }
     
 export const load: PageServerLoad = async () => {
     
-    fetchData();
+    const location = await fetchData();
 
     return {
         form: await superValidate(formSchema),
-        locationList: data,
+        locationList: location,
     };
 };
 
