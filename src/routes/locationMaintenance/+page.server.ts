@@ -4,8 +4,17 @@ import { fail } from "@sveltejs/kit";
 import type { PageServerLoad, Actions } from "./$types";
 import type { Location } from "./location"
 
-async function fetchData() {
-    const apiUrl = 'http://192.168.110.152:9000/testjdbc/location/getLocation';
+export async function _fetchData(id?: number) {
+    // const apiUrl = `http://192.168.110.152:9000/testjdbc/location/getLocation/${id}`;
+
+    let apiUrl: string;
+
+    if (id == 0 || typeof id === 'undefined') {
+        apiUrl = `http://localhost:9000/testjdbc/location/getLocation`;
+    } else {
+        apiUrl = `http://localhost:9000/testjdbc/location/getLocationById/${id}`;
+    }
+    console.log(apiUrl);
     const headers = new Headers({
         'Content-Type': 'application/json',
         'mt-entity-code': 'MTMH'
@@ -32,7 +41,7 @@ async function fetchData() {
     
 export const load: PageServerLoad = async () => {
     
-    const location = await fetchData();
+    const location = await _fetchData();
 
     return {
         form: await superValidate(formSchema),

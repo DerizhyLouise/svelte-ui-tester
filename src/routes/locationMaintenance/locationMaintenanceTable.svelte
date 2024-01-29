@@ -28,82 +28,16 @@
 
 	let rowIndex = 0;
 	const data: Location[] = pageData.locationList;
-	// const data: Location[] = [
-	// 	{
-	// 		location_id: 1,
-	// 		location_name: 'Murni',
-	// 		location_mode: 'instance',
-	// 		status: 'active',
-	// 		location_alias: 'MTMH',
-	// 		description: 'Memorial Murni Teguh',
-	// 		address: ' Jl. Jawa',
-	// 		position_longitude: 0.10000000149011612,
-	// 		position_latitude: 0.20000000298023224,
-	// 		position_altitude: 0.30000001192092896,
-	// 		entity_code: 'MTMH',
-	// 		defunct_ind: false
-	// 	},
-	// 	{
-	// 		location_id: 3,
-	// 		location_name: 'tes',
-	// 		location_mode: 'instance',
-	// 		status: 'active',
-	// 		location_alias: 'MTMH',
-	// 		description: 'tes',
-	// 		address: 'tes',
-	// 		position_longitude: 0.10000000149011612,
-	// 		position_latitude: 0.20000000298023224,
-	// 		position_altitude: 0.30000001192092896,
-	// 		entity_code: 'MTMH',
-	// 		defunct_ind: true
-	// 	},
-	// 	{
-	// 		location_id: 2,
-	// 		location_name: 'p',
-	// 		location_mode: 'p',
-	// 		status: 'p',
-	// 		location_alias: 'MTMH',
-	// 		description: 'p',
-	// 		address: 'p',
-	// 		position_longitude: 0.10000000149011612,
-	// 		position_latitude: 0.20000000298023224,
-	// 		position_altitude: 0.30000001192092896,
-	// 		entity_code: 'MTMH',
-	// 		defunct_ind: false
-	// 	}
-	// ];
-
+	
 	const table = createTable(readable(data), {
 		page: addPagination(),
 		sort: addSortBy({ disableMultiSort: false }),
 		filter: addTableFilter({
 			fn: ({ filterValue, value }) => value.toLowerCase().includes(filterValue.toLowerCase())
 		}),
-		hide: addHiddenColumns(),
-		select: addSelectedRows()
+		hide: addHiddenColumns()
 	});
 	const columns = table.createColumns([
-		table.column({
-			accessor: ({ location_id }) => location_id,
-			header: (_, { pluginStates }) => {
-				const { allPageRowsSelected } = pluginStates.select;
-				return createRender(DataTableCheckbox, {
-					checked: allPageRowsSelected
-				});
-			},
-			cell: ({ row }, { pluginStates }) => {
-				const { getRowState } = pluginStates.select;
-				const { isSelected } = getRowState(row);
-
-				return createRender(DataTableCheckbox, {
-					checked: isSelected
-				});
-			},
-			plugins: {
-				sort: { disable: true },
-				filter: { exclude: true }
-			}
-		}),
 		table.column({
 			accessor: ({ location_id }) => location_id,
 			header: '',
@@ -112,7 +46,7 @@
 				filter: { exclude: true }
 			},
 			cell: ({ value }) => {
-				return createRender(DataTableActions, { location_id: value });
+				return createRender(DataTableActions, { location_id: value, pageData });
 			}
 		}),
 		table.column({
@@ -214,7 +148,6 @@
 	const { sortKeys } = pluginStates.sort;
 	const { filterValue } = pluginStates.filter;
 	const { hiddenColumnIds } = pluginStates.hide;
-	const { selectedDataIds } = pluginStates.select;
 
 	const ids = flatColumns.map((col) => col.id);
 	let hideForId = Object.fromEntries(ids.map((id) => [id, true]));
@@ -240,34 +173,7 @@
 <div>
 	<div class="flex w-full justify-end gap-2">
 		<Button class="h-8 bg-blue-600 hover:bg-blue-800" on:click={query}>Query</Button>
-		<Sheet.Root>
-			<Sheet.Trigger>
-				<Button class="h-8 bg-green-600 hover:bg-green-800">Add</Button>
-			</Sheet.Trigger>
-			<Sheet.Content>
-				<Sheet.Header>
-					<Sheet.Title>Add Location</Sheet.Title>
-					<Separator />
-					<Sheet.Description class="pt-4">
-						<LocationMaintenanceForm form={pageData.form} />
-					</Sheet.Description>
-				</Sheet.Header>
-			</Sheet.Content>
-		</Sheet.Root>
-		<Sheet.Root>
-			<Sheet.Trigger>
-				<Button variant="secondary" class="h-8 bg-gray-200 hover:bg-gray-400">Update</Button>
-			</Sheet.Trigger>
-			<Sheet.Content>
-				<Sheet.Header>
-					<Sheet.Title>Update Location</Sheet.Title>
-					<Separator />
-					<Sheet.Description class="pt-4">
-						<LocationMaintenanceForm form={pageData.form} />
-					</Sheet.Description>
-				</Sheet.Header>
-			</Sheet.Content>
-		</Sheet.Root>
+		<Button class="h-8 bg-green-600 hover:bg-green-800" href="/locationMaintenance/0">Add</Button>
 	</div>
 	<div class="flex w-full justify-between py-4">
 		<DropdownMenu.Root>
@@ -322,11 +228,7 @@
 			<Table.Body {...$tableBodyAttrs}>
 				{#each $pageRows as row (row.id)}
 					<Subscribe rowAttrs={row.attrs()} let:rowAttrs>
-						<Table.Row
-							{...rowAttrs}
-							class={row.isData() && row.original.defunct_ind ? 'bg-red-400 hover:bg-red-500' : ''}
-							data-state={$selectedDataIds[row.id] && 'selected'}
-						>
+						<Table.Row {...rowAttrs} class={row.isData() && row.original.defunct_ind ? 'bg-red-400 hover:bg-red-500' : ''}>
 							{#each row.cells as cell (cell.id)}
 								<Subscribe attrs={cell.attrs()} let:attrs>
 									<Table.Cell {...attrs}>
@@ -343,21 +245,7 @@
 		</Table.Root>
 	</div>
 	<div class="flex items-center justify-end space-x-2 py-4">
-		<div class="flex-1 text-sm text-muted-foreground">
-			{Object.keys($selectedDataIds).length} of{' '}
-			{$rows.length} row(s) selected.
-		</div>
-		<Button
-			variant="outline"
-			size="sm"
-			on:click={() => ($pageIndex = $pageIndex - 1)}
-			disabled={!$hasPreviousPage}>Previous</Button
-		>
-		<Button
-			variant="outline"
-			size="sm"
-			disabled={!$hasNextPage}
-			on:click={() => ($pageIndex = $pageIndex + 1)}>Next</Button
-		>
+		<Button variant="outline" size="sm" on:click={() => ($pageIndex = $pageIndex - 1)} disabled={!$hasPreviousPage}>Previous</Button>
+		<Button variant="outline" size="sm" disabled={!$hasNextPage} on:click={() => ($pageIndex = $pageIndex + 1)}>Next</Button>
 	</div>
 </div>

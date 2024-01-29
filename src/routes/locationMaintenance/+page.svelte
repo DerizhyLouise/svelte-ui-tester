@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { pushState } from '$app/navigation';
+	import { page } from '$app/stores';
 	import * as Tabs from '$lib/components/ui/tabs';
 	import * as Card from '$lib/components/ui/card';
 	import * as Accordion from '$lib/components/ui/accordion';
