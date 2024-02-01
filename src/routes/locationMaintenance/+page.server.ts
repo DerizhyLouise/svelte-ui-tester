@@ -1,18 +1,15 @@
 import { superValidate } from "sveltekit-superforms/server";
 import { formSchema } from "./locationMaintenanceSchema";
-import { fail } from "@sveltejs/kit";
-import type { PageServerLoad, Actions } from "./$types";
-import type { Location } from "./location"
+import type { PageServerLoad } from "./$types";
+import type { Location } from "./locationMaintenanceSchema"
 
 export async function _fetchData(id?: number) {
-    // const apiUrl = `http://192.168.110.152:9000/testjdbc/location/getLocation/${id}`;
-
     let apiUrl: string;
 
     if (id == 0 || typeof id === 'undefined') {
         apiUrl = `http://localhost:9000/testjdbc/location/getLocation`;
     } else {
-        apiUrl = `http://localhost:9000/testjdbc/location/getLocationById/${id}`;
+        apiUrl = `http://localhost:9000/testjdbc/location/getLocation/${id}`;
     }
     console.log(apiUrl);
     const headers = new Headers({
@@ -38,6 +35,57 @@ export async function _fetchData(id?: number) {
     }
     return [];
 }
+
+export async function _addData(data: any) {
+    const apiUrl = `http://localhost:9000/testjdbc/location/addLocation`;
+    console.log(apiUrl);
+
+    const headers = new Headers({
+        'Content-Type': 'application/json',
+        'mt-entity-code': 'MTMH',
+    });
+
+    try {
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify(data)
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+    } catch (error) {
+        console.error('Error adding data:', error);
+    }
+    return [];
+}
+
+export async function _updateData(data: any) {
+    const apiUrl = `http://localhost:9000/testjdbc/location/updateLocation?locationId=${data.location_id}`;
+    data.entity_code = 'MTMH';
+    console.log(apiUrl);
+
+    const headers = new Headers({
+        'Content-Type': 'application/json',
+        'mt-entity-code': 'MTMH',
+    });
+
+    try {
+        const response = await fetch(apiUrl, {
+            method: 'PUT',
+            headers: headers,
+            body: JSON.stringify(data)
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+    } catch (error) {
+        console.error('Error updating data:', error);
+    }
+    return [];
+}
     
 export const load: PageServerLoad = async () => {
     
@@ -47,18 +95,4 @@ export const load: PageServerLoad = async () => {
         form: await superValidate(formSchema),
         locationList: location,
     };
-};
-
-export const actions: Actions = {
-    default: async (event) => {
-        const form = await superValidate(event, formSchema);
-        if (!form.valid) {
-            return fail(400, {
-                form
-            });
-        }
-        return {
-            form
-        };
-    }
 };

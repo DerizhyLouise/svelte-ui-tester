@@ -16,3 +16,5 @@ export const formSchema = z.object({
 });
 
 export type FormSchema = typeof formSchema;
+
+export type Location = z.infer<FormSchema>;

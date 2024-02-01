@@ -4,31 +4,30 @@
 		addPagination,
 		addSortBy,
 		addTableFilter,
-		addHiddenColumns,
-		addSelectedRows
+		addHiddenColumns
 	} from 'svelte-headless-table/plugins';
 	import { readable } from 'svelte/store';
 	import { Button } from '$lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
 	import { Separator } from '$lib/components/ui/separator';
-	import * as Sheet from '$lib/components/ui/sheet';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
+	import * as Sheet from '$lib/components/ui/sheet';
 	import * as Table from '$lib/components/ui/table';
 	import { ArrowUp, ArrowDown, ChevronDown } from 'lucide-svelte';
 	import type { PageData } from './$types';
-	import type { Location } from './location';
-	import type { Writable } from 'svelte/store';
-	import DataTableActions from './locationMaintenanceTableAction.svelte';
-	import LocationMaintenanceForm from './locationMaintenanceForm.svelte';
-	import DataTableCheckbox from './locationMaintenanceTableCheckbox.svelte';
+	import Actions from '$lib/components/ui/data-table/data-table-actions.svelte';
 	import { invalidate, invalidateAll } from '$app/navigation';
+	import { preloadData, pushState, goto } from '$app/navigation';
+	import { page } from '$app/stores';
+	import LocationMaintenanceForm from './[slug]/+page.svelte';
+	import type { Location } from './locationMaintenanceSchema';
 
 	export let pageData: PageData;
-
-	let rowIndex = 0;
 	const data: Location[] = pageData.locationList;
 	
+	let addUpdate: boolean;
+
 	const table = createTable(readable(data), {
 		page: addPagination(),
 		sort: addSortBy({ disableMultiSort: false }),
@@ -39,26 +38,32 @@
 	});
 	const columns = table.createColumns([
 		table.column({
-			accessor: ({ location_id }) => location_id,
 			header: '',
-			plugins: {
-				sort: { disable: true },
-				filter: { exclude: true }
-			},
-			cell: ({ value }) => {
-				return createRender(DataTableActions, { location_id: value, pageData });
-			}
-		}),
-		table.column({
 			accessor: ({ location_id }) => location_id,
-			header: 'No',
-			plugins: {
-				sort: { disable: true },
-				filter: { exclude: true }
+			cell: (item, state) => {
+				return createRender(Actions, {
+					ids: [{ name: 'Location Id', value: item.value }],
+					actionItems: [
+						{
+							name: 'Update',
+							action: async () => {
+								const href = `locationMaintenance/${item.value}`;
+								const result = await preloadData(href);
+								addUpdate = false;
+								if (result.type === 'loaded' && result.status === 200) {
+									pushState(href, { selected: result.data });
+								} else {
+									goto(href);
+								}
+							}
+						}
+					]
+				});
 			},
-			cell: ({ value }) => {
-				rowIndex++;
-				return rowIndex;
+			plugins: {
+				sort: {
+					disable: true
+				}
 			}
 		}),
 		table.column({
@@ -143,7 +148,8 @@
 		})
 	]);
 
-	const { headerRows, pageRows, tableAttrs, tableBodyAttrs, pluginStates, flatColumns, rows } = table.createViewModel(columns);
+	const { headerRows, pageRows, tableAttrs, tableBodyAttrs, pluginStates, flatColumns, rows } =
+		table.createViewModel(columns);
 	const { hasNextPage, hasPreviousPage, pageIndex } = pluginStates.page;
 	const { sortKeys } = pluginStates.sort;
 	const { filterValue } = pluginStates.filter;
@@ -166,14 +172,28 @@
 	];
 
 	function query() {
-		invalidateAll();
+		invalidate('/locationMaintenance');
 	}
 </script>
 
 <div>
 	<div class="flex w-full justify-end gap-2">
 		<Button class="h-8 bg-blue-600 hover:bg-blue-800" on:click={query}>Query</Button>
-		<Button class="h-8 bg-green-600 hover:bg-green-800" href="/locationMaintenance/0">Add</Button>
+		<a class="h-8 bg-green-600 px-4 hover:bg-green-800 inline-flex items-center text-white justify-center rounded-md text-sm font-medium whitespace-nowrap ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2" href="locationMaintenance/0" on:click={
+			async (e) => {
+				if (e.metaKey || innerWidth < 640) return;
+				e.preventDefault();
+
+				const { href } = e.currentTarget;
+				const result = await preloadData(href);
+				addUpdate = true;
+				if (result.type === 'loaded' && result.status === 200) {
+					pushState(href, { selected: result.data });
+				} else {
+					goto(href);
+				}
+			}
+		}>Add</a>
 	</div>
 	<div class="flex w-full justify-between py-4">
 		<DropdownMenu.Root>
@@ -228,7 +248,10 @@
 			<Table.Body {...$tableBodyAttrs}>
 				{#each $pageRows as row (row.id)}
 					<Subscribe rowAttrs={row.attrs()} let:rowAttrs>
-						<Table.Row {...rowAttrs} class={row.isData() && row.original.defunct_ind ? 'bg-red-400 hover:bg-red-500' : ''}>
+						<Table.Row
+							{...rowAttrs}
+							class={row.isData() && row.original.defunct_ind ? 'bg-red-400 hover:bg-red-500' : ''}
+						>
 							{#each row.cells as cell (cell.id)}
 								<Subscribe attrs={cell.attrs()} let:attrs>
 									<Table.Cell {...attrs}>
@@ -249,3 +272,22 @@
 		<Button variant="outline" size="sm" disabled={!$hasNextPage} on:click={() => ($pageIndex = $pageIndex + 1)}>Next</Button>
 	</div>
 </div>
+
+<Sheet.Root open={$page.state.selected != null}>
+	<Sheet.Content>
+		<Sheet.Header>
+			<Sheet.Title>
+				{#if addUpdate}
+					Add 
+				{:else}
+					Update 
+				{/if}
+				Location
+			</Sheet.Title>
+			<Separator />
+			<Sheet.Description class="pt-4">
+				<LocationMaintenanceForm data={$page.state.selected} />
+			</Sheet.Description>
+		</Sheet.Header>
+	</Sheet.Content>
+</Sheet.Root>
