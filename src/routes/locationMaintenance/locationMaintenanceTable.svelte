@@ -6,7 +6,7 @@
 		addTableFilter,
 		addHiddenColumns
 	} from 'svelte-headless-table/plugins';
-	import { readable } from 'svelte/store';
+	import { readable, writable, type Writable } from 'svelte/store';
 	import { Button } from '$lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
@@ -24,11 +24,13 @@
 	import type { Location } from './locationMaintenanceSchema';
 
 	export let pageData: PageData;
-	const data: Location[] = pageData.locationList;
+	const data: Writable<Location[]> = writable(pageData.locationList);
+
+	$: $data = pageData.locationList;
 	
 	let addUpdate: boolean;
 
-	const table = createTable(readable(data), {
+	const table = createTable(data, {
 		page: addPagination(),
 		sort: addSortBy({ disableMultiSort: false }),
 		filter: addTableFilter({
@@ -172,7 +174,7 @@
 	];
 
 	function query() {
-		invalidate('/locationMaintenance');
+		invalidate('http://localhost:5173/locationMaintenance');
 	}
 </script>
 

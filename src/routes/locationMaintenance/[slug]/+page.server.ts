@@ -5,17 +5,23 @@ import { formSchema, type Location } from "../locationMaintenanceSchema";
 import { fail } from "@sveltejs/kit";
 
 export async function load({ params }) {
-	let id: number = +params.slug;
+    let id: number = +params.slug;
 
-	const data: Location[] = await _fetchData(id);
-	return {
-		form: await superValidate(data, formSchema)
-	};
+    if (id != 0) {
+        const locations: Location[] = await _fetchData(id);
+        const data = formSchema.parse(locations[0]);
+        return {
+            form: await superValidate(data, formSchema)
+        };
+    }
+    return {
+        form: await superValidate(formSchema)
+    }
 }
 
 export const actions = {
-	submit: async (event) => {
-		const form = await superValidate(event, formSchema);
+    submit: async (event) => {
+        const form = await superValidate(event, formSchema);
         if (!form.valid) {
             return fail(400, {
                 form
@@ -25,5 +31,5 @@ export const actions = {
         } else {
             _updateData(form.data);
         }
-	}
+    }
 } satisfies Actions;

@@ -88,9 +88,7 @@ export async function _updateData(data: any) {
 }
     
 export const load: PageServerLoad = async () => {
-    
-    const location = await _fetchData();
-
+    const location: Location[] = await _fetchData();
     return {
         form: await superValidate(formSchema),
         locationList: location,

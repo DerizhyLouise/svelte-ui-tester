@@ -14,7 +14,7 @@
 		onResult: (result) => {
 			if (result.result.type === 'success') {
 				history.back();
-				invalidate('/locationMaintenance');
+				invalidate('http://localhost:5173/locationMaintenance');
 			}
 		},
 	};
@@ -25,7 +25,7 @@
 		<div class="flex flex-wrap">
 			<Form.Field {config} name="location_id">
 				<Form.Item>
-					<Form.Input id="location_id" type="hidden" value={form.data?.location_id}></Form.Input>
+					<Form.Input id="location_id" type="hidden" value={form.data.location_id}></Form.Input>
 				</Form.Item>
 			</Form.Field>
 			<Form.Field {config} name="location_name">
@@ -104,7 +104,8 @@
 					</div>
 					<div class="pr-4 md:w-2/3">
 						<Form.Input class="bg-white-200 w-full appearance-none rounded border-2 border-gray-200 px-4 py-2 leading-tight text-gray-700 focus:outline-none disabled:bg-gray-200"
-							id="position_longitude" type="text" value={form.data?.position_longitude}/>
+							id="position_longitude" type="number" value={form.data?.position_longitude}/>
+						<Form.Validation />
 					</div>
 				</Form.Item>
 			</Form.Field>
@@ -116,6 +117,7 @@
 					<div class="pr-4 md:w-2/3">
 						<Form.Input class="bg-white-200 w-full appearance-none rounded border-2 border-gray-200 px-4 py-2 leading-tight text-gray-700 focus:outline-none disabled:bg-gray-200"
 							id="position_latitude" type="text" value={form.data?.position_latitude}/>
+						<Form.Validation />
 					</div>
 				</Form.Item>
 			</Form.Field>
@@ -127,6 +129,7 @@
 					<div class="pr-4 md:w-2/3">
 						<Form.Input class="bg-white-200 w-full appearance-none rounded border-2 border-gray-200 px-4 py-2 leading-tight text-gray-700 focus:outline-none disabled:bg-gray-200"
 							id="position_altitude" type="text" value={form.data?.position_altitude}/>
+						<Form.Validation />
 					</div>
 				</Form.Item>
 			</Form.Field>

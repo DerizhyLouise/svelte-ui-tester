@@ -8,7 +8,11 @@ export const formSchema = z.object({
     location_alias: z.string(),
     description: z.string(),
     address: z.string(),
-    position_longitude: z.number(),
+    position_longitude: z.preprocess(
+        (position_longitude) =>
+            parseInt(z.string().parse(typeof position_longitude === 'number' ? position_longitude.toString() : position_longitude)),
+        z.number().nonnegative()
+    ),
     position_latitude: z.number(),
     position_altitude: z.number(),
     entity_code: z.string(),

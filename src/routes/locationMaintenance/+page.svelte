@@ -6,6 +6,7 @@
 	import * as Accordion from '$lib/components/ui/accordion';
     import type { PageData } from "./$types";
 	import LocationMaintenanceTable from "./locationMaintenanceTable.svelte";
+	import { writable } from 'svelte/store';
 
 	export let data: PageData;
 </script>
