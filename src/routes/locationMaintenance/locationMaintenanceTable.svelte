@@ -275,7 +275,7 @@
 	</div>
 </div>
 
-<Sheet.Root open={$page.state.selected != null}>
+<Sheet.Root open={$page.state.selected != null} onOutsideClick={() => history.back()} onOpenChange={() => history.back()}>
 	<Sheet.Content>
 		<Sheet.Header>
 			<Sheet.Title>

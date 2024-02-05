@@ -9,7 +9,7 @@ export async function load({ params }) {
 
     if (id != 0) {
         const locations: Location[] = await _fetchData(id);
-        const data = formSchema.parse(locations[0]);
+        const data = formSchema.parse(locations);
         return {
             form: await superValidate(data, formSchema)
         };

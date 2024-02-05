@@ -10,11 +10,19 @@ export const formSchema = z.object({
     address: z.string(),
     position_longitude: z.preprocess(
         (position_longitude) =>
-            parseInt(z.string().parse(typeof position_longitude === 'number' ? position_longitude.toString() : position_longitude)),
+            parseFloat(z.string().parse(typeof position_longitude === 'number' ? position_longitude.toString() : position_longitude)),
         z.number().nonnegative()
     ),
-    position_latitude: z.number(),
-    position_altitude: z.number(),
+    position_latitude: z.preprocess(
+        (position_latitude) =>
+            parseFloat(z.string().parse(typeof position_latitude === 'number' ? position_latitude.toString() : position_latitude)),
+        z.number().nonnegative()
+    ),
+    position_altitude: z.preprocess(
+        (position_altitude) =>
+            parseFloat(z.string().parse(typeof position_altitude === 'number' ? position_altitude.toString() : position_altitude)),
+        z.number().nonnegative()
+    ),
     entity_code: z.string(),
     defunct_ind: z.boolean(),
 });
