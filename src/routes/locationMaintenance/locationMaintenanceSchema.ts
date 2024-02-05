@@ -1,10 +1,19 @@
 import { z } from "zod";
 
-export const formSchema = z.object({
+const statusEnum = [
+    { label: "Active", value: "active" },
+    { label: "Unactive", value: "unactive" }
+] as const;
+
+type Status = (typeof statusEnum)[number]["value"];
+
+export const locationSchema = z.object({
     location_id: z.number(),
     location_name: z.string().min(1),
     location_mode: z.string().min(1),
-    status: z.string().min(1),
+    status: z.enum(
+        statusEnum.map((f) => f.value) as [Status, ...Status[]]
+    ),
     location_alias: z.string(),
     description: z.string(),
     address: z.string(),
@@ -27,6 +36,4 @@ export const formSchema = z.object({
     defunct_ind: z.boolean(),
 });
 
-export type FormSchema = typeof formSchema;
-
-export type Location = z.infer<FormSchema>;
+export type Location = z.infer<typeof locationSchema>;

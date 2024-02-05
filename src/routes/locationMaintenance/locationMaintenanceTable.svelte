@@ -18,7 +18,7 @@
 	import type { PageData } from './$types';
 	import Actions from '$lib/components/ui/data-table/data-table-actions.svelte';
 	import { invalidate, invalidateAll } from '$app/navigation';
-	import { preloadData, pushState, goto } from '$app/navigation';
+	import { preloadData, pushState, goto, replaceState } from '$app/navigation';
 	import { page } from '$app/stores';
 	import LocationMaintenanceForm from './[slug]/+page.svelte';
 	import type { Location } from './locationMaintenanceSchema';
@@ -163,24 +163,23 @@
 	$: $hiddenColumnIds = Object.entries(hideForId).filter(([, hide]) => !hide).map(([id]) => id);
 	const hidableCols = [
 		'hospitalOrganization',
-		'status',
 		'location_mode',
-		'location_name',
 		'address',
-		'location_alias',
 		'managing_organization',
 		'description',
-		'position_longitude'
+		'position_longitude',
+		'position_altitude',
+		'position_latitude',
 	];
 
 	function query() {
-		invalidate('http://localhost:5173/locationMaintenance');
+		invalidateAll();
 	}
 </script>
 
 <div>
 	<div class="flex w-full justify-end gap-2">
-		<Button class="h-8 bg-blue-600 hover:bg-blue-800" on:click={query}>Query</Button>
+		<Button class="h-8 bg-blue-600 hover:bg-blue-800" on:click={query}>Refresh</Button>
 		<a class="h-8 bg-green-600 px-4 hover:bg-green-800 inline-flex items-center text-white justify-center rounded-md text-sm font-medium whitespace-nowrap ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2" href="locationMaintenance/0" on:click={
 			async (e) => {
 				if (e.metaKey || innerWidth < 640) return;
@@ -288,8 +287,8 @@
 			</Sheet.Title>
 			<Separator />
 			<Sheet.Description class="pt-4">
-				<LocationMaintenanceForm data={$page.state.selected} />
 			</Sheet.Description>
 		</Sheet.Header>
+		<LocationMaintenanceForm data={$page.state.selected} />
 	</Sheet.Content>
 </Sheet.Root>

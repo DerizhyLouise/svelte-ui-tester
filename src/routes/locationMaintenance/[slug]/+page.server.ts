@@ -1,7 +1,7 @@
 import { _fetchData, _addData, _updateData } from "../+page.server.js";
 import type { Actions } from "@sveltejs/kit";
 import { superValidate } from "sveltekit-superforms/server";
-import { formSchema, type Location } from "../locationMaintenanceSchema";
+import { locationSchema, type Location } from "../locationMaintenanceSchema";
 import { fail } from "@sveltejs/kit";
 
 export async function load({ params }) {
@@ -9,19 +9,19 @@ export async function load({ params }) {
 
     if (id != 0) {
         const locations: Location[] = await _fetchData(id);
-        const data = formSchema.parse(locations);
+        const data = locationSchema.parse(locations);
         return {
-            form: await superValidate(data, formSchema)
+            form: await superValidate(data, locationSchema)
         };
     }
     return {
-        form: await superValidate(formSchema)
+        form: await superValidate(locationSchema)
     }
 }
 
 export const actions = {
     submit: async (event) => {
-        const form = await superValidate(event, formSchema);
+        const form = await superValidate(event, locationSchema);
         if (!form.valid) {
             return fail(400, {
                 form

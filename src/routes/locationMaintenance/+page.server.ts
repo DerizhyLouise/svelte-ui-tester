@@ -1,5 +1,3 @@
-import { superValidate } from "sveltekit-superforms/server";
-import { formSchema } from "./locationMaintenanceSchema";
 import type { PageServerLoad } from "./$types";
 import type { Location } from "./locationMaintenanceSchema"
 
@@ -90,7 +88,6 @@ export async function _updateData(data: any) {
 export const load: PageServerLoad = async () => {
     const location: Location[] = await _fetchData();
     return {
-        form: await superValidate(formSchema),
         locationList: location,
     };
 };
